@@ -1,4 +1,5 @@
 
+
 from django.http import HttpResponse
 from django.shortcuts import render
 import operator
@@ -6,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 import psycopg2
 
-conn_string = "host='localhost' dbname ='uspressm' user='uspressm' password='codefair'"
+conn_string = "host='localhost' dbname ='uspressm2' user='uspressm2' password='codefair'"
 conn = psycopg2.connect(conn_string)
 cur = conn.cursor()
 
@@ -19,7 +20,7 @@ nytitles = list()
 for title in nytimes:
     #SQL="INSERT INTO uspressmtable (title) VALUES" \
     #    + "(" + "'" + title.text + "'" + ")"
-    SQL = "INSERT INTO uspressmtable2 (publisher, title) VALUES" \
+    SQL = "INSERT INTO uspressm2 (publisher, title) VALUES" \
           + "(" + "'NYtimes'" + "," + "'" +title.text + "'" + ")"
 
     cur.execute(SQL)
@@ -27,10 +28,9 @@ for title in nytimes:
     print(title.text)
 
 
-cur.execute("SELECT * FROM uspressmtable2;")
+cur.execute("SELECT * FROM uspressm2;")
 result = cur.fetchall()
 print(result)
 
 conn.commit()
 conn.close()
-
