@@ -1,0 +1,62 @@
+from django.http import HttpResponse
+from django.shortcuts import render
+import operator
+import requests
+from bs4 import BeautifulSoup
+
+# postgresql 설치 후 파이썬과 연결하는 모듈 악명높 psycopg2
+# 설치시 에러가 잘 나는 모듈, Googling 으로 해결
+import psycopg2
+
+
+#데이타 베이스 연결
+#데이타 베이스 종류에 상관없이 연결 부분 거의 같음
+# 우분투 상 postgreSQL 설치 후 세팅 테이타베이스 생성, 테이블 생성, 소유주 변경, 우분투 상 동일 유저 패스워드 생성
+# 연결 에러 많이 남 과정 이해 필요
+
+conn_string = "host='localhost' dbname ='uspressm' user='uspressm' password='codefair'"
+conn = psycopg2.connect(conn_string)
+cur = conn.cursor()
+
+page = requests.get('https://www.nytimes.com/section/world/asia')
+soup = BeautifulSoup(page.content, 'html.parser')
+nytimes = soup.select('div > div.css-4jyr1y > a > h2')
+
+# Html 화일로 리스트 넘길때 필요 특수 문자 빠진 순수한 TEXT 추출할때 이용
+# BS 에서 사용하는 오브젝.TEXT 형식 Html 에서 파이썬 코드 삽입시 에러
+# Html 화일로 순수 TEXT 정보 넘기기 위해 파이썬 공용 리스트 형식으로 전처리
+nytitles = list()
+
+for title in nytimes:
+
+    # SQL 명령문 Insert 할때 여러가지 방법이 있는데 *** 아래 방법 추천
+    # 복잡해 보이지만 파이썬에서 사용되는 변수 그대로 사용하며
+    # Format 에러 줄일수 있음.
+
+    #SQL="INSERT INTO uspressmtable (title) VALUES" \
+    #    + "(" + "'" + title.text + "'" + ")"
+
+    #***
+    SQL = "INSERT INTO uspressmtable (publisher, title) VALUES" \
+          + "(" + "'NYtimes'" + "," + "'" +title.text + "'" + ")"
+
+#  SQL 문 프린트해서 문법 형식에 맞나 확인
+    print(SQL)
+
+    # 데이타가 Format 에러가 안나는 간단한 형태의 데이타라면 아래 SQL +++ 사용 추천
+    #+++
+    #cur.execute("INSERT INTO uspressmtable (title) VALUES(%s)", (title.text))
+
+    cur.execute(SQL)
+
+    print(title.text)
+    #nytitles.append(title.text)
+
+cur.execute("SELECT * FROM uspressmtable;")
+result = cur.fetchall()
+print(result)
+
+# 데이터베이스 변동이 일어났다면 반드시 사용
+conn.commit()
+# 사용이 끝난 데이타베이스 연결 해제
+conn.close()
