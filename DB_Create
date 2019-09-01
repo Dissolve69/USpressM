@@ -1,0 +1,10 @@
+
+create table uspressm2 (
+num serial,
+publisher varchar,
+date date,
+title varchar,
+author varchar,
+links varchar,
+contents text
+);
