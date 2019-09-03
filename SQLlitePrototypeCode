@@ -1,0 +1,34 @@
+
+from django.http import HttpResponse
+from django.shortcuts import render
+import operator
+import requests
+from bs4 import BeautifulSoup
+import sqlite3
+
+page = requests.get('https://www.nytimes.com/section/world/asia')
+soup = BeautifulSoup(page.content, 'html.parser')
+nytimestitle = soup.select('div > div.css-4jyr1y > a > h2')
+nytitles = list()
+
+conn = sqlite3.connect("test.db")
+cur = conn.cursor()
+
+for title in nytimestitle:
+    #SQL="INSERT INTO uspressmtable (title) VALUES" \
+    #    + "(" + "'" + title.text + "'" + ")"
+    SQL = "INSERT INTO test7 (publisher, title) VALUES" \
+          + "(" + "'NYtimes'" + "," + "'" +title.text + "'" + ")"
+
+    cur.execute(SQL)
+    print(title.text)
+
+# 테이블 생성 한번만 이후 주석처리
+#cur.execute("create table test7 (num INTEGER PRIMARY KEY AUTOINCREMENT, publisher TEXT, data TEXT, title TEXT UNIQUE ON CONFLICT IGNORE, author TEXT, links TEXT UNIQUE ON CONFLICT IGNORE, contents TEXT)")
+#conn.commit()
+
+cur.execute("select * from test7")
+rows = cur.fetchall()
+print (rows)
+conn.close()
+
