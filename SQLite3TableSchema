@@ -1,0 +1,16 @@
+
+# Create table for the project 
+# Change Name test6 to rean name
+# SQLite3
+
+
+
+create table test6 (
+num serial,
+publisher text,
+date date,
+title text unique on conflict ignore,
+author text,
+links text unique on conflict ignore,
+contents text
+);
