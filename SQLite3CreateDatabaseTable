@@ -1,0 +1,15 @@
+
+import sqlite3
+
+conn = sqlite3.connect("test.db")
+cur = conn.cursor()
+
+
+cur.execute("create table test7 (num INTEGER PRIMARY KEY AUTOINCREMENT, publisher TEXT, data TEXT, title TEXT UNIQUE ON CONFLICT IGNORE, author TEXT, links TEXT UNIQUE ON CONFLICT IGNORE, contents TEXT)")
+conn.commit()
+
+cur.execute("select * from test7")
+rows = cur.fetchall()
+print (rows)
+
+conn.close() 
